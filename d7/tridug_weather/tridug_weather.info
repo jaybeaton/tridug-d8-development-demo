@@ -1,0 +1,5 @@
+name = TriDUG Weather
+description = "Displays a weather widget in a block"
+package = Other
+core = 7.x
+configure = admin/config/system/weather

@@ -1,0 +1,9 @@
+name: TriDUG Weather
+type: module
+description: Displays a weather widget in a block
+core: 8.x
+package: Custom
+configure: tridug_weather.weather_config
+dependencies:
+- block
+- user

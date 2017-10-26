@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ * Provides a configurable weather widget block.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function tridug_weather_theme() {
+  return [
+    'tridug_weather' => [
+      'variables' => ['zip' => NULL],
+      'template' => 'tridug-weather',
+    ],
+  ];
+}
+
+/**
+ * Get zip code for user.
+ *
+ * @param null $account
+ *
+ * @return mixed
+ */
+function tridug_weather_get_user_zip($account = NULL) {
+
+  if (!$account) {
+    $account = \Drupal::currentUser();
+  }
+
+  $user = \Drupal\user\Entity\User::load($account->id());
+
+  return $user->field_zip_code->value;
+
+}
+
+/**
+ * Get most-popular zip code among users.
+ *
+ * @return mixed
+ */
+function tridug_weather_get_popular_zip() {
+
+  /** @var \Drupal\Core\Database\Connection $db */
+  $db = \Drupal::service('database');
+
+  $query = $db->select('user__field_zip_code', 'z');
+  $query->join('users_field_data', 'u', "z.entity_id = u.uid");
+  $query->condition('u.status', 1)
+    ->isNotNull('z.field_zip_code_value');
+  $query->addField('z', 'field_zip_code_value');
+  $query->addExpression('COUNT(z.entity_id)', 'num_times');
+  $query->groupBy('z.field_zip_code_value');
+  $query->orderBy('num_times', 'DESC');
+  return $query->execute()->fetchField();
+
+}

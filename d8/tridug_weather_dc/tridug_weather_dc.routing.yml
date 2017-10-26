@@ -1,0 +1,17 @@
+
+tridug_weather_dc.weather_config:
+  path: '/admin/config/system/weather-dc'
+  defaults:
+    _form: '\Drupal\tridug_weather_dc\Form\WeatherConfig'
+    _title: 'WeatherConfig'
+  requirements:
+    _access: 'TRUE'
+  
+
+tridug_weather_dc.weather_page_weatherInfo:
+  path: '/weather-dc'
+  defaults:
+    _controller: '\Drupal\tridug_weather_dc\Controller\WeatherPage::weatherInfo'
+    _title: 'Weather information'
+  requirements:
+    _permission: 'access content'

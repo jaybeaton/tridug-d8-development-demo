@@ -1,0 +1,15 @@
+tridug_weather.weather_config:
+  path: '/admin/config/system/weather'
+  defaults:
+    _form: '\Drupal\tridug_weather\Form\WeatherConfig'
+    _title: 'Weather widget'
+  requirements:
+    _permission: 'administer site configuration'
+
+tridug_weather.weather_info:
+  path: '/weather'
+  defaults:
+    _controller: '\Drupal\tridug_weather\Controller\WeatherPage::weatherInfo'
+    _title: 'Weather information'
+  requirements:
+    _permission: 'access content'

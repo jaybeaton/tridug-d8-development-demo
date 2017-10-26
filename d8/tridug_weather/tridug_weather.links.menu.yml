@@ -1,0 +1,5 @@
+tridug_weather.weather_config:
+  title: 'Weather widget'
+  parent: system.admin_config_system
+  description: 'Manage settings for Weather widget.'
+  route_name: tridug_weather.weather_config

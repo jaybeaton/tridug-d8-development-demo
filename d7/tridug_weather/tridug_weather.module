@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * @file
+ * Provides a configurable weather widget block.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function tridug_weather_menu() {
+  $items = array();
+  $items['admin/config/system/weather'] = array(
+    'title' => 'Weather widget',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tridug_weather_configuration_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'tridug_weather.admin.inc',
+  );
+  $items['weather'] = array(
+    'title' => 'Weather information',
+    'page callback' => 'tridug_weather_show_weather_page',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'tridug_weather.pages.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function tridug_weather_theme() {
+  return array(
+    'tridug_weather_widget' => array(
+      'variables' => array('zip' => NULL),
+      'template' => 'tridug-weather',
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function tridug_weather_block_info() {
+  $blocks['tridug_weather'] = array(
+    'info' => t('TriDUG weather'),
+    'cache' => DRUPAL_CACHE_PER_PAGE,
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function tridug_weather_block_view($delta = '') {
+  $block = array(
+    'subject' => '',
+    'content' => '',
+  );
+  switch ($delta) {
+    case 'tridug_weather':
+      $block['subject'] = t('Weather');
+      if (!$zip = variable_get('tridug_weather_zip', NULL)) {
+        $block['content'] = array(
+          '#markup' => '<p>'
+          . t('Zip code not set.')
+          . '</p>',
+        );
+        watchdog('tridug', 'Zip code not set', array(), WATCHDOG_ERROR);
+      }
+      else {
+        $block['content'] = theme('tridug_weather_widget', array('zip' => $zip));
+      }
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Get zip code for user.
+ *
+ * @param null $account
+ *
+ * @return mixed
+ */
+function tridug_weather_get_user_zip($account = NULL) {
+
+  global $user;
+
+  if (!$account) {
+    $account = $user;
+  }
+
+  $wrapper = entity_metadata_wrapper('user', $account);
+  return $wrapper->field_zip_code->value();
+
+}
+
+/**
+ * Get most-popular zip code among users.
+ *
+ * @return mixed
+ */
+function tridug_weather_get_popular_zip() {
+
+  $query = db_select('field_data_field_zip_code', 'z');
+  $query->join('users', 'u', "z.entity_id = u.uid AND z.entity_type = 'user'");
+  $query->condition('u.status', 1)
+    ->isNotNull('z.field_zip_code_value');
+  $query->addField('z', 'field_zip_code_value');
+  $query->addExpression('COUNT(z.entity_id)', 'num_times');
+  $query->groupBy('z.field_zip_code_value');
+  $query->orderBy('num_times', 'DESC');
+  return $query->execute()->fetchField();
+
+}

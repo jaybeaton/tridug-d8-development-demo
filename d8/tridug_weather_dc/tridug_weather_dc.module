@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Contains tridug_weather_dc.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function tridug_weather_dc_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the tridug_weather_dc module.
+    case 'help.page.tridug_weather_dc':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Displays a weather widget in a block') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function tridug_weather_dc_theme() {
+  return [
+    'tridug_weather_dc' => [
+      'render element' => 'children',
+    ],
+  ];
+}
